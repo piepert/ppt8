@@ -1,0 +1,3 @@
+alloc       0, 0x0000, 18, "HäöüÄÖÜßllo Welt!\x0a"
+mov_axv     1, 0x0000
+int_v       2

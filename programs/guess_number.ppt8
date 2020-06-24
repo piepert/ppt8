@@ -1,0 +1,182 @@
+alloc   str_intro,      word 0,     word 40, "Errate eine Nummer zwischen 0 und 100!\x0a\x00"
+alloc   str_more,       word 40,    word 22, "Die Zahl ist größer!\x0a\x00"
+alloc   str_less,       word 62,    word 23, "Die Zahl ist kleiner!\x0a\x00"
+alloc   str_prompt,     word 85,    word 3, "> \x00"
+alloc   str_error,      word 88,    word 51, "Die Eingabe war leider falsch. Versuch's nochmal!\x0a\x00"
+alloc   str_thats_it,   word 139,   word 27, "Richtig, das ist die Zahl!\x00"
+alloc   rand_num,       word 193,   word 1, 0
+alloc   str_too_long,   word 194,   word 28, "Deine Eingabe war zu groß!\x0a\x00"
+alloc   char_out,       word 222,   word 2, " \x00"
+alloc   input_buffer,   word 235,   word 1, "\x00"
+
+jmp     start                       # jump to start
+
+str_to_num:                         # convert string to a number ; needs address of string in ax, length in bx -> result in dx
+    mov     dx, word 0
+    mov     gx, ax                  # backup of address ax
+
+    mov     ex, bx                  # backup length
+    cmp     bx, word 3              # check if length of string is bigger than 3
+    jg      stn_error
+
+    stn_l1:
+        cmp     bx, word 0
+        je      stn_end
+
+        mov     cl, @gx             # 8bit-value (char of str) from gx to cl
+
+        cmp     cl, 0x39            # check if cl is greater than 9s ascii value
+        jg      stn_error
+
+        cmp     cl, 0x30            # check if cl is less then 0s ascii value (if its not between 0 and 9 it isnt a number)
+        jl      stn_error
+
+        stn_cmp:                    # convert the character
+            sub     cl, 0x30        # set char to its integer value
+            cmp     bx, word 3
+            je      stn_first
+
+            cmp     bx, word 2
+            je      stn_second
+
+            cmp     bx, word 1
+            je      stn_third
+
+            cmp     bx, word 0
+            je      stn_end
+
+            stn_first:
+                mul     cl, 100
+                jmp     stn_do_cmp
+
+            stn_second:
+                mul     cl, 10
+                jmp     stn_do_cmp
+
+            stn_third:
+            stn_do_cmp:
+                add     dl, cl      # add integer to dl
+                dec     bx
+                inc     gx
+                jmp     stn_l1      # load next symbol
+
+    jmp     stn_end
+
+    stn_error:
+        mov     dx, word 0xff
+
+    stn_end:
+        mov     dh, 0
+        ret
+
+num_to_str:                         # convert number to string
+
+input_line:                         # input string, save it to memory address at ax, save length in bx
+    mov     cx, ax
+
+    l1:
+        int     0x04
+        mov     dh, 0               # entire dx becomes dl
+        cmp     dl, 10              # check if dh is new line
+        je      finished
+
+        mov     @cx, dl             # save char to memory address of bx
+        inc     cx                  # increase address
+        jmp     l1
+
+    finished:
+        sub     cx, ax              # cx = cx-ax => address-difference is string-length
+        mov     bx, cx
+        ret
+
+random_number:                      # generate randoom number between 0 and 100
+    mov     ax, word 0              # ax = 0
+    int     0x08                    # generate random number from 0 and 9 into dx
+    mul     dx, word 100            # dx *= 100
+    add     ax, dx                  # ax += dx
+
+    int     0x08                    # generate random number from 0 and 9 into dx
+    mul     dx, word 10             # dx *= 10
+    add     ax, dx                  # ax += dx
+
+    int     0x08                    # generate random number from 0 and 9 into dx
+    add     ax, dx                  # ax += dx
+
+    rn_cmp:
+        cmp     ax, word 100        # if ax > 100 ...
+        jg      rn_ten              # ... goto rn_ten
+
+        cmp     ax, word 0          # if ax == 0 ...
+        je      rn_add              # ... goto rn_add
+
+        jmp     rn_end              # goto rn_end
+
+    rn_ten:
+        div     ax, word 10         # ax /= 10
+        jmp     rn_cmp              # goto rn_cmp
+
+    rn_add:
+        add     ax, word 1          # ax += 1
+        jmp     rn_cmp              # goto rn_cmp
+
+    rn_end:
+        ret                         # return
+
+start:
+    call    random_number           # generate random number into ax
+    mov     @rand_num, al           # lower bits of ax into rand_num
+
+    _st:
+        mov     ax, word str_intro
+        int     0x02                # print str_intro
+
+    try:
+        mov     ax, word str_prompt
+        int     0x02                # print str_prompt
+
+        mov     ax, word input_buffer    # string will be stored at 100
+        call    input_line          # input a line
+
+        mov     ax, word input_buffer    # string will be stored at 100
+        call    str_to_num          # convert input to number, stored in dx
+
+        cmp     ex, word 3
+        jg      s_too_long
+
+        cmp     dx, word 0xff       # check if error happened
+        je      s_error             # if error, jump to s_error
+
+        mov     fx, dx              # backup input to fx
+        mov     dl, 0x0a
+        int     0x01                # print a new line character
+
+        cmp     fl, @rand_num       # check if dx == rand_num
+        je      s_end               # if fx==dx -> jump to s_end
+        jg      s_lower
+        jl      s_bigger
+
+        s_bigger:
+            mov     ax, word str_more
+            int     0x02            # print str_error
+            jmp     try             # else fx != dx -> jump to try
+
+        s_lower:
+            mov     ax, word str_less
+            int     0x02            # print str_error
+            jmp     try             # else fx != dx -> jump to try
+
+        s_too_long:
+            mov     ax, word str_too_long
+            int     0x02            # print str_error
+            jmp     try             # else fx != dx -> jump to try
+
+        s_error:
+            mov     ax, word str_error
+            int     0x02            # print str_error
+            jmp     try             # else fx != dx -> jump to try
+
+    s_end:
+        mov     ax, word str_thats_it
+        int     0x02
+        int     0x03                # press any key to end
+        int     0x07                # exit

@@ -1,0 +1,11 @@
+mov_axv     ax, 0x0000
+jmp_v start
+
+buf_to_num:
+    alloc       0x0000, 0 1, "B"
+    int_v       2
+
+start:
+    alloc       0x0000, 0 39, "ARate eine Nummer zwischen 1 und 100!\x0a\x00"
+    int_v       2
+    jmp_v       buf_to_num

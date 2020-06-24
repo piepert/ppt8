@@ -1,0 +1,14 @@
+jmp start
+
+hallo:
+    alloc   word 0, ~, "Hallo Welt!\x0a"
+    mov     ax, word 0
+    int     0x02
+    int     0x02
+    ret
+    int     0x02
+
+start:
+    call    hallo
+    int     0x02
+    int     0x03        # enter to continue

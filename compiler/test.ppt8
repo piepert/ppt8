@@ -1,0 +1,3 @@
+alloc hallo, word 0xff, ~, "Hallo Welt!\"\x0a\x00"
+mov ax, word hallo
+int 0x02

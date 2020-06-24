@@ -1,0 +1,30 @@
+#ifndef C_\_HPP
+#define C_\_HPP
+
+#include <string>
+#include <iostream>
+#include "../command/command.hpp"
+#include "../runtime/runtime.hpp"
+#include "../std/functions.hpp"
+#include "../std/std.hpp"
+
+class COMMAND : public Command
+{
+public:
+    uint8_t getOpcode() override
+    {
+        return OPCODE;
+    }
+
+    int getLength() override
+    {
+        return ARGC;
+    }
+
+    int run(std::vector<uint8_t> args, Runtime* runtime) override // COMMAND
+    {
+        return 0;
+    }
+};
+
+#endif
