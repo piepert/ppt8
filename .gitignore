@@ -6,6 +6,8 @@
 **/ppt8b2s
 **/ppt8c
 
+**/*.py
+
 **/cmake_install.cmake
 **/CMakeFiles/
 **/CMakeCache.txt
