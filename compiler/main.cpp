@@ -66,9 +66,17 @@ int main(int argc, char* argv[])
                     continue;
 
                 if (command.size()-(i+1) < 2 && command[i+1].getType().getPattern() != "vv")
-                    command.insert(command.begin()+i+1, Token("0x00", TokenType("v"), command[i].getLine(), command[i].getLineIndex()));
-                else if (command[i+1].getType().getPattern() != "vv" && command[i+1].getType().getPattern()+command[i+2].getType().getPattern() != "vv")
-                    command.insert(command.begin()+i+1, Token("0x00", TokenType("v"), command[i].getLine(), command[i].getLineIndex()));
+                    command.insert(command.begin()+i+1,
+                        Token("0x00", TokenType("v"),
+                            command[i].getLine(),
+                            command[i].getLineIndex()));
+
+                else if (command[i+1].getType().getPattern() != "vv" &&
+                    command[i+1].getType().getPattern()+command[i+2].getType().getPattern() != "vv")
+                    command.insert(command.begin()+i+1,
+                        Token("0x00", TokenType("v"),
+                            command[i].getLine(),
+                            command[i].getLineIndex()));
             }
         }
     }
@@ -105,7 +113,8 @@ int main(int argc, char* argv[])
                     exit(1);
                 }
 
-                runtime.addVariable(Variable(command[i].getValue(), command[i+1].getValue()+" "+command[i+2].getValue()));
+                runtime.addVariable(Variable(command[i].getValue(),
+                    command[i+1].getValue()+" "+command[i+2].getValue()));
                 i++;
             }
 
@@ -121,12 +130,18 @@ int main(int argc, char* argv[])
             }
             else
             {
-                output += command[i].getValue()+" "+command[i+1].getValue() + ", "+command[i+2].getValue()+" "+command[i+3].getValue()+", ";
+                output += command[i].getValue()+" "+
+                    command[i+1].getValue() + ", "+
+                    command[i+2].getValue()+" "+
+                    command[i+3].getValue()+", ";
+
                 i += 4;
             }
 
             for (; i < command.size(); i++)
-                output += (command[i].getType().getPattern() == "s" ? "\"" : "") + command[i].getValue() + (command[i].getType().getPattern() == "s" ? "\"" : "") + " ";
+                output += (command[i].getType().getPattern() == "s" ? "\"" : "") +
+                    command[i].getValue() +
+                    (command[i].getType().getPattern() == "s" ? "\"" : "") + " ";
 
             output += "\n";
             // alloc a,l,...
@@ -139,7 +154,8 @@ int main(int argc, char* argv[])
 
             if (mnemonic == "null")
             {
-                std::cout << "error in line " << command[0].getLine() << ": incorrect combination of instruction and arguments." << std::endl;
+                std::cout << "error in line " << command[0].getLine() <<
+                    ": incorrect combination of instruction and arguments." << std::endl;
                 exit(1);
             }
 

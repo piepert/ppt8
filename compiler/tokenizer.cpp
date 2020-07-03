@@ -63,7 +63,10 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                     std::regex bin("0b[01]+");
                     std::regex dec("0d[0-9]+");
 
-                    if (!is_number(tmp) && !std::regex_match(tmp, hex) && !std::regex_match(tmp, bin) && !std::regex_match(tmp, dec) && tmp != "word")
+                    if (!is_number(tmp) &&
+                        !std::regex_match(tmp, hex) &&
+                        !std::regex_match(tmp, bin) &&
+                        !std::regex_match(tmp, dec) && tmp != "word")
                     {
                         if (!std::regex_match(tmp, e))
                         {
@@ -74,7 +77,8 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                         {
                             if (runtime->existsNameByValue(tmp))
                             {
-                                std::cout << "error in line " << linec << ": name \"" << tmp << "\" already exists." << std::endl;
+                                std::cout << "error in line " <<
+                                    linec << ": name \"" << tmp << "\" already exists." << std::endl;
                                 exit(1);
                             }
 
@@ -83,10 +87,16 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                         }
                     }
                     else
-                        toks.push_back(Token(TokenType::makeValue(tmp), TokenType::determineType(tmp, linec, runtime), linec, linei));
+                        toks.push_back(Token(TokenType::makeValue(tmp),
+                            TokenType::determineType(tmp, linec, runtime),
+                            linec,
+                            linei));
                 }
                 else
-                    toks.push_back(Token(TokenType::makeValue(tmp), TokenType::determineType(tmp, linec, runtime), linec, linei));
+                    toks.push_back(Token(TokenType::makeValue(tmp),
+                        TokenType::determineType(tmp, linec, runtime),
+                        linec,
+                        linei));
                 tmp = "";
             }
 
@@ -109,7 +119,10 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
         {
             if (!tmp.empty())
             {
-                toks.push_back(Token(TokenType::makeValue(tmp), TokenType::determineType(tmp, linec, runtime), linec, linei));
+                toks.push_back(Token(TokenType::makeValue(tmp),
+                    TokenType::determineType(tmp, linec, runtime),
+                    linec,
+                    linei));
                 tmp = "";
             }
 
@@ -121,7 +134,10 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
         {
             if (!tmp.empty())
             {
-                toks.push_back(Token(TokenType::makeValue(tmp), TokenType::determineType(tmp, linec, runtime), linec, linei));
+                toks.push_back(Token(TokenType::makeValue(tmp),
+                    TokenType::determineType(tmp, linec, runtime),
+                    linec,
+                    linei));
                 tmp = "";
             }
 
@@ -137,7 +153,10 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
         {
             if (!tmp.empty())
             {
-                toks.push_back(Token(TokenType::makeValue(tmp), TokenType::determineType(tmp, linec, runtime), linec, linei));
+                toks.push_back(Token(TokenType::makeValue(tmp),
+                    TokenType::determineType(tmp, linec, runtime),
+                    linec,
+                    linei));
                 tmp = "";
             }
 
@@ -150,7 +169,8 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                         hexstr_to_ints(code[i+2]+std::string("")+code[i+3]);
                     else
                     {
-                        std::cout << "error: line " << linec << ":" << linei << ": error with \\x in string. needs one hex byte. eg \"\\xff\"" << std::endl;
+                        std::cout << "error: line " << linec << ":" <<
+                            linei << ": error with \\x in string. needs one hex byte. eg \"\\xff\"" << std::endl;
                         exit(1);
                     }
 
