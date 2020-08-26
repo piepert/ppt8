@@ -668,9 +668,11 @@ int main(int argc, char* argv[])
 
     std::string str((std::istreambuf_iterator<char>(ifs)),
                     std::istreambuf_iterator<char>());
-    std::ofstream ofs(argv[3]);
 
-    for (char c : compile(lex(str)))
+    std::vector<uint8_t> codes = compile(lex(str));
+    std::ofstream ofs(argv[3], std::ios::binary);
+
+    for (char c : codes)
         ofs << c;
 
     return 0;
