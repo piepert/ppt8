@@ -10,9 +10,9 @@ namespace ppt8_std {
     uint8_t get_higher_8bit_from_16bit(uint16_t val);
     uint8_t get_lower_8bit_from_16bit(uint16_t val);
     char get_char();
-    void clrscr();
+    void clrscr(Runtime* runtime);
 
-    int run_command(uint8_t command, std::string* code, int* index, Runtime* runtime);
+    int run_command(uint8_t command, int* index, Runtime* runtime);
 }
 
 #endif //EMULATOR_STD_HPP

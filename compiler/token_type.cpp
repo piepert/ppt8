@@ -69,6 +69,9 @@ TokenType TokenType::determineType(std::string token, int line, Runtime* runtime
     if (token == "~")
         return TokenType("s_len");
 
+    if (token == "db")
+        return TokenType("db");
+
     std::cout << "error in line " << line << ": unknown token \"" << token << "\"." << std::endl;
     exit(1);
 }

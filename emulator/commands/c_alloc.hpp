@@ -31,7 +31,7 @@ public:
 
         for (i = 0; i < len; i++)
         {
-            runtime->getMemory()->setValue(address+i, runtime->PROGRAMM_CODE[++runtime->PROGRAMM_INDEX]);
+            runtime->getMemory()->setValue(address+i, runtime->getMemory()->getValueFromAddress(++runtime->PROGRAMM_INDEX));
 
             if (runtime->DEBUG)
             {
@@ -48,12 +48,12 @@ public:
                     line = "";
                 }
 
-                if ((int) runtime->PROGRAMM_CODE[runtime->PROGRAMM_INDEX] < 17)
+                if ((int) runtime->getMemory()->getValueFromAddress(runtime->PROGRAMM_INDEX) < 17)
                     std::cout << "0";
-                std::cout << std::hex << (int) runtime->PROGRAMM_CODE[runtime->PROGRAMM_INDEX] << " ";
+                std::cout << std::hex << (int) runtime->getMemory()->getValueFromAddress(runtime->PROGRAMM_INDEX) << " ";
 
-                if ((int) runtime->PROGRAMM_CODE[runtime->PROGRAMM_INDEX] > 32)
-                    line += (char) runtime->PROGRAMM_CODE[runtime->PROGRAMM_INDEX];
+                if ((int) runtime->getMemory()->getValueFromAddress(runtime->PROGRAMM_INDEX) > 32)
+                    line += (char) runtime->getMemory()->getValueFromAddress(runtime->PROGRAMM_INDEX);
                 else
                     line += ".";
             }

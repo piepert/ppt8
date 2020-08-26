@@ -1,0 +1,157 @@
+jmp start
+
+ch_codes:
+ch_one:
+    db 1 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 1 1 0 0 0
+    db 0 0 1 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 1 1 1 1 1 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+
+ch_two:
+    db 1 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 1 1 1 1 0 0
+    db 0 1 0 0 0 0 1 0
+    db 0 0 0 0 0 0 1 0
+    db 0 0 0 0 0 0 1 0
+    db 0 0 0 0 0 0 1 0
+    db 0 0 0 0 0 1 0 0
+    db 0 0 0 0 1 0 0 0
+    db 0 0 0 1 0 0 0 0
+    db 0 0 1 0 0 0 0 0
+    db 0 1 0 0 0 0 0 0
+    db 0 1 0 0 0 0 0 0
+    db 0 1 1 1 1 1 1 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+
+ch_three:
+    db 1 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+    db 0 0 0 0 0 0 0 0
+
+turn_on:
+    mov     cl, 0xff
+    int     10
+    ret
+
+turn_off:
+    mov     cl, 0
+    int     10
+    ret
+
+write_char:                         # ax=charcode
+    push    dx
+    push    ex
+    push    fx
+    push    gx
+    push    ax
+
+    mul     ax, word 8
+    mul     ax, word 20
+    add     ax, ch_codes
+
+    mov     dx, @0xfff0             # load screen-x-position into dx
+    mov     ex, @0xfff2             # load screen-y-position into ex
+
+    mov     fx, word 20             # character height
+    push    ex                      # save x-position
+
+    wch_l1:
+        mov     gx, word 8          # character width
+        push    dx                  # save x-position
+
+        wch_l2:
+            mov     cl, @ax
+            mul     cl, 255
+
+            push    ax
+            push    bx
+            mov     ax, dx
+            mov     bx, ex
+            int     10
+
+            pop     bx
+            pop     ax
+
+            inc     dx
+            inc     ax
+
+            dec     gx
+            cmp     gx, word 0
+            jg      wch_l2
+
+        pop     dx
+        inc     ex
+        dec     fx
+        cmp     fx, word 0
+        jg      wch_l1
+
+    pop     ex
+    add     dx, word 8
+    mov     @0xfff0, dx             # save screen-x-position to 0xfff0
+    mov     @0xfff2, ex             # save screen-y-position to 0xfff2
+
+    pop     ax
+    pop     gx
+    pop     fx
+    pop     ex
+    pop     dx
+    ret
+
+start:
+    alloc   0xfff0, 0x0002, 0x0000
+    alloc   0xfff2, 0x0002, 0x0000
+
+    mov     ax, word 0
+    call    write_char
+
+    mov     ax, word 1
+    call    write_char
+
+    mov     ax, word 2
+    call    write_char
+
+    mov     ax, word 0
+    call    write_char
+    int     4

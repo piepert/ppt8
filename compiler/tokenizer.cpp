@@ -14,13 +14,13 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
 
     for (int i = 0; i < code.size(); i++)
     {
-        if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == ',' || code[i] == ';' || code[i] == '"')
+        if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == ',' || code[i] == '"')
         {
             if (code[i] == '\n')
                 linec++;
             tmp = "";
         }
-        else if (code[i] == '#')
+        else if (code[i] == '#' || code[i] == ';')
         {
             while (code[i] != '\n')
                 i++;
@@ -52,7 +52,7 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
 
     for (int i = 0; i < code.size(); i++)
     {
-        if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == ',' || code[i] == ';')
+        if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == ',')
         {
             if (!tmp.empty())
             {
@@ -115,7 +115,7 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
             else if (code[i] == ',')
                 toks.push_back(Token(",", TokenType(","), linec, linei));
         }
-        else if (code[i] == '#')
+        else if (code[i] == '#' || code[i] == ';')
         {
             if (!tmp.empty())
             {

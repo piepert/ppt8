@@ -158,7 +158,7 @@ const std::vector<std::vector<std::string>> MNEMONIC_PATTERNS = { // ALLOC NOT I
     { "cmp_rr", "cmp r,r" }
 };
 
-std::string get_mnemonic_for_pattern(std::vector<Token> pattern)
+std::string create_pattern(std::vector<Token> pattern)
 {
     if (pattern.size() == 0)
         return "null";
@@ -179,6 +179,13 @@ std::string get_mnemonic_for_pattern(std::vector<Token> pattern)
 
     if (pattern.size() == 1)
         p = pattern[0].getValue();
+
+    return p;
+}
+
+std::string get_mnemonic_for_pattern(std::vector<Token> pattern)
+{
+    std::string p = create_pattern(pattern);
 
     for (int i = 0; i < MNEMONIC_PATTERNS.size(); i++)
     {

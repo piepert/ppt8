@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include "functions.hpp"
 #include "../runtime/runtime.hpp"
@@ -79,6 +80,37 @@ int ppt8_std::functions::interrupt(uint8_t code, Runtime *runtime)
                 for (int i = 0; i < line.size(); i++)
                     runtime->getMemory()->setValue(runtime->getAX()->getComplete16bit()+i, line[i]);
             }
+            break;
+
+        case 10: { // write pixel; x position in ax, y position in bx, transparency in cx
+            runtime->setPixelState(runtime->getAX()->getComplete16bit(),
+                                   runtime->getBX()->getComplete16bit(),
+                                   runtime->getCX()->getLower8bit());
+
+            /*int pixel_size = runtime->getPixelSize();
+            sf::RectangleShape rect;
+
+            rect.setSize(sf::Vector2f(pixel_size, pixel_size));
+            rect.setPosition(runtime->getAX()->getComplete16bit()*pixel_size,
+                             runtime->getBX()->getComplete16bit()*pixel_size);
+
+            rect.setFillColor(sf::Color(runtime->getCX()->getLower8bit(),
+                runtime->getCX()->getLower8bit(),
+                runtime->getCX()->getLower8bit()));
+
+            runtime->window->draw(rect);*/
+
+            // runtime->SCREEN_UPDATE = true;
+            break;
+        }
+
+        case 11: { // write pixel; x position in ax, y position in bx, transparency in cx
+            runtime->WAIT_FOR_KEY_PRESS = true;
+            break;
+        }
+
+        case 12: // clear pixels
+            runtime->clearPixels();
             break;
 
         default:

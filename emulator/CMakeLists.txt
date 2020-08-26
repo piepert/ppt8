@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(emulator)
 
-set(CMAKE_CXX_FLAGS "-lncurses")
+set(CMAKE_CXX_FLAGS "-lsfml-graphics -lsfml-window -lpthread -lsfml-system")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -208,5 +208,7 @@ add_executable(ppt8e
         commands/c_mov_fxm.hpp # ok
         commands/c_mov_gxm.hpp # ok
         commands/c_mov_hxm.hpp # ok
+
+        commands/_c_nop.hpp # ok
 
         )

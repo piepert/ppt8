@@ -43,7 +43,7 @@ std::vector<int> hexstr_to_ints(std::string hex)
     return ret;
 }
 
-int ppt8_std::run_command(uint8_t command, std::string* code, int* index, Runtime* runtime)
+int ppt8_std::run_command(uint8_t command, int* index, Runtime* runtime)
 {
     if (!runtime->existsCommand(command))
         return 2;
@@ -54,8 +54,9 @@ int ppt8_std::run_command(uint8_t command, std::string* code, int* index, Runtim
     while (count < runtime->getCommand(command)->getLength())
     {
         (*index)++;
-        args.push_back(code->operator[](*index));
         count++;
+
+        args.push_back(runtime->getMemory()->getValueFromAddress(*index));
     }
 
     if (runtime->DEBUG)
@@ -261,8 +262,10 @@ char ppt8_std::get_char()
 #endif
 }
 
-void ppt8_std::clrscr()
+void ppt8_std::clrscr(Runtime* runtime)
 {
+    runtime->clearPixels();
+
 #ifdef __DJGPP__
     system("cls");
 #else

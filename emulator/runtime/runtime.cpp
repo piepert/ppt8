@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include "runtime.hpp"
 #include "../commands/c_int_r.hpp"
 #include "../commands/c_int_v.hpp"
@@ -119,6 +120,7 @@
 #include "../commands/c_mov_dxr.hpp"
 #include "../commands/c_mov_exr.hpp"
 #include "../commands/c_mov_rm.hpp"
+#include "../commands/_c_nop.hpp"
 
 Memory *Runtime::getMemory()
 {
@@ -177,6 +179,9 @@ void Runtime::addCommand(Command *command)
 
 bool Runtime::existsCommand(uint8_t opcode)
 {
+    if (opcode < RT_CMD_MEM_SIZE)
+        return true;
+
     for (Command *x : this->commands)
     {
         if (x->getOpcode() == opcode)
@@ -191,18 +196,21 @@ std::vector<Command *> *Runtime::getCommands()
     return &commands;
 }
 
-Command *Runtime::getCommand(uint8_t opcode)
+Command *Runtime::getCommand(uint8_t opcode, bool iterate)
 {
+    if (!iterate)
+        return this->command_mem[opcode];
+
     for (Command *x : this->commands)
     {
         if (x->getOpcode() == opcode)
             return x;
     }
 
-    return nullptr;
+    return this->nop_command;
 }
 
-Runtime::Runtime()
+Runtime::Runtime(int screen_width, int screen_height, sf::RenderWindow* window)
 {
     this->reg_ax = Register();
     this->reg_bx = Register();
@@ -214,6 +222,8 @@ Runtime::Runtime()
     this->reg_hx = Register();
 
     this->memory = Memory();
+    this->window = window;
+    this->nop_command = new NOP();
 
     this->commands.push_back(new Int_R());
     this->commands.push_back(new Int_V());
@@ -355,8 +365,27 @@ Runtime::Runtime()
     this->commands.push_back(new Div_MS());
     this->commands.push_back(new Div_SV());
 
+    for (int i = 0; i < RT_CMD_MEM_SIZE; i++)
+    {
+        this->command_mem[i] = getCommand(i, true);
+    }
+
     this->PROGRAMM_INDEX = 0;
     this->DEBUG = false;
+    this->WAIT_FOR_KEY_PRESS = false;
+    this->INPUT_BUFFER = sf::Keyboard::Key();
+    this->screen = new sf::Uint8[screen_height * screen_width * 4];
+
+    for(int i = 0; i < screen_width*screen_height*4; i += 4)
+    {
+        this->screen[i] = 0;
+        this->screen[i+1] = 0;
+        this->screen[i+2] = 0;
+        this->screen[i+3] = 255;
+    }
+
+    this->screen_width = screen_width;
+    this->screen_height = screen_height;
 }
 
 Register *Runtime::getRegisterByID(uint8_t id)
@@ -514,4 +543,59 @@ void Runtime::push16bitSplittet(uint16_t i)
 {
     this->stack.push(ppt8_std::get_higher_8bit_from_16bit(i));
     this->stack.push(ppt8_std::get_lower_8bit_from_16bit(i));
+}
+
+int Runtime::getPixelState(int x, int y)
+{
+    if (y >= this->screen_height || y < 0)
+        return 0;
+
+    if (x >= this->screen_width || x < 0)
+        return 0;
+
+    return screen[(y*this->screen_width + x) * 4];
+}
+
+void Runtime::setPixelState(int x, int y, uint8_t state)
+{
+    if (y >= this->screen_height || y < 0)
+        return;
+
+    if (x >= this->screen_width || x < 0)
+        return;
+
+    screen[(y*this->screen_width + x) * 4] = state;
+    screen[(y*this->screen_width + x) * 4 + 1] = state;
+    screen[(y*this->screen_width + x) * 4 + 2] = state;
+    screen[(y*this->screen_width + x) * 4 + 3] = state;
+}
+
+sf::Uint8* Runtime::getPixelStates()
+{
+    return this->screen;
+}
+
+void Runtime::clearPixels()
+{
+    /*
+    sf::RectangleShape rect;
+    rect.setPosition(0, 0);
+    rect.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
+    rect.setFillColor(sf::Color::Black);
+
+    window->draw(rect);
+    */
+
+    for(int i = 0; i < screen_width*screen_height*4; i += 4)
+    {
+        this->screen[i] = 0;
+        this->screen[i+1] = 0;
+        this->screen[i+2] = 0;
+        this->screen[i+3] = 255;
+    }
+}
+
+int Runtime::getPixelSize()
+{
+    return window->getSize().x / this->screen_width;
 }
