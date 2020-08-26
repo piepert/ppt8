@@ -219,6 +219,10 @@ int ppt8_std::run_command(uint8_t command, int* index, Runtime* runtime)
 }
 
 #if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__DJGPP__)) && !defined(__CYGWIN__)
+#define WINDOWS
+#endif
+
+#ifdef WINDOWS
 #include <conio.h>
 #else
 #include <unistd.h>
@@ -255,7 +259,7 @@ char __getchar()
 char ppt8_std::get_char()
 {
     std::cin.sync();
-#ifdef __DJGPP__
+#ifdef WINDOWS
     return getch();
 #else
     return __getchar();
@@ -266,7 +270,7 @@ void ppt8_std::clrscr(Runtime* runtime)
 {
     runtime->clearPixels();
 
-#ifdef __DJGPP__
+#ifdef WINDOWS
     system("cls");
 #else
     system("clear");
