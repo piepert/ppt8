@@ -217,7 +217,7 @@ int ppt8_std::run_command(uint8_t command, std::string* code, int* index, Runtim
     return runtime->getCommand(command)->run(args, runtime);
 }
 
-#if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__DJGPP__)) && !defined(__CYGWIN__)
+#if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__DJGPP__) || defined(__MINGW32__)) && !defined(__CYGWIN__)
 #include <conio.h>
 #else
 #include <unistd.h>
@@ -254,7 +254,7 @@ char __getchar()
 char ppt8_std::get_char()
 {
     std::cin.sync();
-#ifdef __DJGPP__
+#if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__DJGPP__) || defined(__MINGW32__)) && !defined(__CYGWIN__)
     return getch();
 #else
     return __getchar();
@@ -263,7 +263,7 @@ char ppt8_std::get_char()
 
 void ppt8_std::clrscr()
 {
-#ifdef __DJGPP__
+#if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__DJGPP__) || defined(__MINGW32__)) && !defined(__CYGWIN__)
     system("cls");
 #else
     system("clear");

@@ -1,0 +1,4 @@
+mov ax, word 10
+mov bx, word 10
+mov cl, 255
+int 0x0a

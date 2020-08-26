@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.16)
-project(emulator)
+cmake_minimum_required(VERSION 3.13)
+project(ppt8e)
 
 set(CMAKE_CXX_FLAGS "-lncurses")
+set(CMAKE_CXX_FLAGS "-lsfml-graphics -lsfml-window -lpthread -lsfml-system -LC:\\Users\\trist\\Desktop\\Privat\\SFML\\bin -LC:\\Users\\trist\\Desktop\\Privat\\SFML\\lib")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -210,3 +211,17 @@ add_executable(ppt8e
         commands/c_mov_hxm.hpp # ok
 
         )
+
+if (WIN32)
+    set(SFML_INCLUDE_DIR "C:/Users/trist/Desktop/Privat/SFML/include/")
+    link_directories("C:/Users/trist/Desktop/Privat/SFML/lib/"
+            "C:/Users/trist/Desktop/Privat/SFML/bin")
+    target_link_libraries(ppt8e "C:/Users/trist/Desktop/Privat/SFML/bin")
+
+    set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+    find_package(SFML 2 REQUIRED system window graphics network audio)
+    if(SFML_FOUND)
+        include_directories(${SFML_INCLUDE_DIR})
+        target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES})
+    endif()
+endif ()
