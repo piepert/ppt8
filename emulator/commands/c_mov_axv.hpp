@@ -18,7 +18,7 @@ public:
 
     int run(std::vector<uint8_t> args, Runtime* runtime) override // mov_axv <v²>
     {
-        uint8_t v = ppt8_std::combine_8bit_to_16bit(args[0], args[1]);
+        uint16_t v = ppt8_std::combine_8bit_to_16bit(args[0], args[1]);
         runtime->getAX()->setValueComplete16bit(v);
         return 0;
     }

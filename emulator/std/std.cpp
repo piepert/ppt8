@@ -62,15 +62,15 @@ int ppt8_std::run_command(uint8_t command, int* index, Runtime* runtime)
     if (runtime->DEBUG)
     {
         std::cout << std::endl;
-        std::cout << "AX=" << std::hex << (int) runtime->getAX()->getComplete16bit()
-                  << " BX=" << (int) runtime->getBX()->getComplete16bit()
-                  << " CX=" << (int) runtime->getCX()->getComplete16bit()
-                  << " DX=" << (int) runtime->getDX()->getComplete16bit() << std::endl;
+        std::cout << "AX=" << std::hex << (int) runtime->getAX()->getHigher8bit() << " " << (int) runtime->getAX()->getLower8bit() 
+                  << " BX=" << (int) runtime->getBX()->getHigher8bit() << " " << (int) runtime->getBX()->getLower8bit()
+                  << " CX=" << (int) runtime->getCX()->getHigher8bit() << " " << (int) runtime->getCX()->getLower8bit()
+                  << " DX=" << (int) runtime->getDX()->getHigher8bit() << " " << (int) runtime->getDX()->getLower8bit() << std::endl;
 
-        std::cout << "EX=" << std::hex << (int) runtime->getEX()->getComplete16bit()
-                  << " FX=" << (int) runtime->getFX()->getComplete16bit()
-                  << " GX=" << (int) runtime->getGX()->getComplete16bit()
-                  << " HX=" << (int) runtime->getHX()->getComplete16bit() << std::endl;
+        std::cout << "EX=" << std::hex << (int) runtime->getEX()->getHigher8bit() << " " << (int) runtime->getEX()->getLower8bit()
+                  << " FX=" << (int) runtime->getFX()->getHigher8bit() << " " << (int) runtime->getFX()->getLower8bit()
+                  << " GX=" << (int) runtime->getGX()->getHigher8bit() << " " << (int) runtime->getGX()->getLower8bit()
+                  << " HX=" << (int) runtime->getHX()->getHigher8bit() << " " << (int) runtime->getHX()->getLower8bit() << std::endl;
 
         std::cout << "[" << std::setw(3) << std::hex << runtime->PROGRAMM_INDEX << std::dec << " ]  " << std::hex << (int) command << std::dec << " ";
         std::string str;
