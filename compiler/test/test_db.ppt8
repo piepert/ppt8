@@ -1,0 +1,16 @@
+alloc           input_buffer, word 600, word 1, "\x00"
+
+jmp     start                       # jump to start
+
+str_intro:      db "Errate eine Nummer zwischen 0 und 100!\x0a\x00"
+str_more:       db "Die Zahl ist gr\xf6\xdfer!\x0a\x00"
+str_less:       db "Die Zahl ist kleiner!\x0a\x00"
+str_prompt:     db "> \x00"
+str_error:      db "Die Eingabe war leider falsch. Versuch's nochmal!\x0a\x00"
+str_thats_it:   db "Richtig, das ist die Zahl!\x0a\x00"
+rand_num:       db 0
+str_too_long:   db "Deine Eingabe war zu gro\xdf!\x0a\x00"
+char_out:       db " \x00"
+
+start:
+    int 0x07
