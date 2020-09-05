@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
             lm = cache;
             std::cout << "Updated. " << cache << std::endl;
         }
-        
+
         std::ifstream ifs(argv[1]);
 
         if (!ifs.is_open())
@@ -78,34 +78,33 @@ int main(int argc, char* argv[])
         {
             if (command.size() > 0 && command[0].getValue() == "db")
             {
+                /*std::cout << std::endl << "DB" << std::endl;
+                for (int i = 0; i < command.size(); i++)
+                    std::cout << command[i].getValue() << " " << t.getValue() << " -> " << t.getType().getPattern() << std::endl;*/
+
                 if (t.getType().getPattern() == "new_line")
                     continue;
-                else if (t.getType().getPattern() != "v" && 
-                    t.getType().getPattern() != "vv" && 
+                else if (t.getType().getPattern() != "v" &&
+                    t.getType().getPattern() != "vv" &&
                     t.getType().getPattern() != "str")
                 {
                     if (!command.empty())
                         commands.push_back(command);
-
                     command.clear();
-                    command.push_back(t);
                 }
-                else
-                    command.push_back(t);
-
-                continue;
             }
+
 
             if (t.getType().getPattern() == "label_def")
             {
                 if (!command.empty())
+                {
                     commands.push_back(command);
-
-                command.clear();
+                    command.clear();
+                }
 
                 command.push_back(t);
                 commands.push_back(command);
-
                 command.clear();
                 continue;
             }
@@ -121,6 +120,9 @@ int main(int argc, char* argv[])
 
             command.push_back(t);
         }
+
+        if (command.size() != 0)
+            commands.push_back(command);
 
         for (std::vector<Token> &command : commands)
         {
@@ -141,6 +143,7 @@ int main(int argc, char* argv[])
                     {
                         Token tok = command[i+1];
                         command.erase(command.begin()+i+1);
+
                         command.insert(command.begin()+i+1,
                             Token(tok.getValue(), TokenType("vv"),
                                 tok.getLine(),
@@ -167,9 +170,9 @@ int main(int argc, char* argv[])
 
         for (std::vector<Token> &command : commands)
         {
-            /* for (int i = 0; i < command.size(); i++)
-                std::cout << command[i].getValue() << " " << command[i].getType().getPattern() << std::endl;
-            std::cout << std::endl; */
+            /*for (int i = 0; i < command.size(); i++)
+                std::cout << "=> " << command[i].getValue() << " " << command[i].getType().getPattern() << std::endl;
+            std::cout << std::endl;*/
 
             output += "    ";
             if (command[0].getType().getPattern() == "label_def")
@@ -186,6 +189,7 @@ int main(int argc, char* argv[])
                     else
                         output += command[i].getValue()+" ";
                 }
+
                 output += "\n";
             }
             else if (command[0].getValue() == "alloc")
@@ -251,7 +255,7 @@ int main(int argc, char* argv[])
             {
                 std::string mnemonic = get_mnemonic_for_pattern(command);
                 output += mnemonic+" ";
-                
+
                 /* std::cout << "C" << std::endl;
                 for (auto c : command)
                     std::cout << "CC " << c.getValue() << " " << mnemonic << std::endl; */
