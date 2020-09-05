@@ -46,7 +46,7 @@ public:
     bool CTRL_PRESSED = false;
     sf::RenderWindow* window;
 
-    Runtime(int screen_width, int screen_height, sf::RenderWindow* window);
+    Runtime(int screen_width, int screen_height);
 
     Memory* getMemory();
     std::stack<uint8_t>* getStack();

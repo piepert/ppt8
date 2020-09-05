@@ -1,15 +1,27 @@
-alloc   str_intro,      word 0,     word 40, "Errate eine Nummer zwischen 0 und 100!\x0a\x00"
-alloc   str_more,       word 40,    word 22, "Die Zahl ist gr\xf6\xdfer!\x0a\x00"
-alloc   str_less,       word 62,    word 23, "Die Zahl ist kleiner!\x0a\x00"
-alloc   str_prompt,     word 85,    word 3, "> \x00"
-alloc   str_error,      word 88,    word 51, "Die Eingabe war leider falsch. Versuch's nochmal!\x0a\x00"
-alloc   str_thats_it,   word 139,   word 27, "Richtig, das ist die Zahl!\x00"
-alloc   rand_num,       word 193,   word 1, 0
-alloc   str_too_long,   word 194,   word 28, "Deine Eingabe war zu gro\xdf!\x0a\x00"
-alloc   char_out,       word 222,   word 2, " \x00"
-alloc   input_buffer,   word 235,   word 1, "\x00"
+# alloc   str_intro,      word 0,     word 40, "Errate eine Nummer zwischen 0 und 100!\x0a\x00"
+# alloc   str_more,       word 40,    word 22, "Die Zahl ist gr\xf6\xdfer!\x0a\x00"
+# alloc   str_less,       word 62,    word 23, "Die Zahl ist kleiner!\x0a\x00"
+# alloc   str_prompt,     word 85,    word 3, "> \x00"
+# alloc   str_error,      word 88,    word 51, "Die Eingabe war leider falsch. Versuch's nochmal!\x0a\x00"
+# alloc   str_thats_it,   word 139,   word 27, "Richtig, das ist die Zahl!\x00"
+# alloc   rand_num,       word 193,   word 1, 0
+# alloc   str_too_long,   word 194,   word 28, "Deine Eingabe war zu gro\xdf!\x0a\x00"
+# alloc   char_out,       word 222,   word 2, " \x00"
+# alloc   input_buffer,   word 235,   word 1, "\x00"
+
+alloc           input_buffer, word 600, word 1, "\x00"
 
 jmp     start                       # jump to start
+
+str_intro:      db "Errate eine Nummer zwischen 0 und 100!\x0a\x00"
+str_more:       db "Die Zahl ist gr\xf6\xdfer!\x0a\x00"
+str_less:       db "Die Zahl ist kleiner!\x0a\x00"
+str_prompt:     db "> \x00"
+str_error:      db "Die Eingabe war leider falsch. Versuch's nochmal!\x0a\x00"
+str_thats_it:   db "Richtig, das ist die Zahl!\x00"
+rand_num:       db 0
+str_too_long:   db "Deine Eingabe war zu gro\xdf!\x0a\x00"
+char_out:       db " \x00"
 
 str_to_num:                         # convert string to a number ; needs address of string in ax, length in bx -> result in dx
     mov     dx, word 0
@@ -78,6 +90,8 @@ input_line:                         # input string, save it to memory address at
         int     0x04
         mov     dh, 0               # entire dx becomes dl
         cmp     dl, 10              # check if dh is new line
+        je      finished
+        cmp     dl, 13              # check if dh is new line (on windows)
         je      finished
 
         mov     @cx, dl             # save char to memory address of bx

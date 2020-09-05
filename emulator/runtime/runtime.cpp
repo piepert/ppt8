@@ -210,7 +210,7 @@ Command *Runtime::getCommand(uint8_t opcode, bool iterate)
     return this->nop_command;
 }
 
-Runtime::Runtime(int screen_width, int screen_height, sf::RenderWindow* window)
+Runtime::Runtime(int screen_width, int screen_height)
 {
     this->reg_ax = Register();
     this->reg_bx = Register();
@@ -222,7 +222,6 @@ Runtime::Runtime(int screen_width, int screen_height, sf::RenderWindow* window)
     this->reg_hx = Register();
 
     this->memory = Memory();
-    this->window = window;
     this->nop_command = new NOP();
 
     this->commands.push_back(new Int_R());

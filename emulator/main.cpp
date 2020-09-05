@@ -11,6 +11,51 @@
 
 int main(int argc, char* argv[])
 {
+    bool debug = false;
+    bool nogui = false;
+    std::string file;
+    std::string code;
+
+    for (int i = 0; i < argc; i++) {
+        if (std::string(argv[i]) == "-nogui") 
+            nogui = true;
+        else if (std::string(argv[i]) == "debug") 
+            debug = true;
+        else 
+            file = argv[i];
+    }
+
+    if (nogui)
+    {
+        Runtime runtime = Runtime(0, 0);
+        runtime.DEBUG = debug;
+        std::fstream bin;
+        bin.open(file, std::ios::in | std::ios::binary);
+
+        if (!bin.good())
+        {
+            std::cout << "error: file \"" << file << "\" not found." << std::endl;
+
+            if (!debug)
+                return 1;
+        }
+
+        code = std::string((std::istreambuf_iterator<char>(bin)), std::istreambuf_iterator<char>());
+
+        for (int i = 0; i < code.size(); i++)
+            runtime.getMemory()->setValue(i, code[i]);
+
+        // for (int* i = &runtime.PROGRAMM_INDEX; *i < runtime.PROGRAMM_CODE.size(); runtime.PROGRAMM_INDEX++)
+        //    ppt8_std::run_command(code[*i], &runtime.PROGRAMM_CODE, i, &runtime);
+
+        
+        while (runtime.PROGRAMM_INDEX < 65534) {
+            ppt8_std::run_command(runtime.getMemory()->getValueFromAddress(runtime.PROGRAMM_INDEX), &runtime.PROGRAMM_INDEX, &runtime);
+            runtime.PROGRAMM_INDEX++;
+        }
+        return 0;
+    }
+
     int grid_width = 40;
     int grid_height = 10;
 
@@ -23,32 +68,7 @@ int main(int argc, char* argv[])
     int pixel_size = window_width / emulated_window_width;
 
     sf::RenderWindow window(sf::VideoMode(window_width, window_height), "PPT8 Emulator", sf::Style::Titlebar | sf::Style::Close);
-    Runtime runtime = Runtime(emulated_window_width, emulated_window_height, &window);
-
-    bool debug = false;
-    std::string file;
-    std::string code;
-
-    if (argc == 2)
-    {
-        if (argv[1] != "debug")
-            file = argv[1];
-        else
-        {
-            std::cout << "error: syntax for \"debug\"-mode: ppt8e debug <binary>" << std::endl;
-            return 1;
-        }
-    }
-    else if (argc == 3)
-    {
-        debug = true;
-        file = argv[2];
-    }
-    else
-    {
-        std::cout << "error: syntax: ppt8e [debug] <binary>" << std::endl;
-        return 1;
-    }
+    Runtime runtime = Runtime(emulated_window_width, emulated_window_height);
 
     runtime.DEBUG = debug;
     std::fstream bin;
@@ -74,7 +94,7 @@ int main(int argc, char* argv[])
     texture.create(emulated_window_width, emulated_window_height);
     sf::Sprite sprite(texture); // needed to draw the texture on screen
 
-    std::thread([](Runtime* runtime) {
+    std::thread t1([](Runtime* runtime) {
         while (runtime->PROGRAMM_INDEX < 65534) {
             if (!runtime->WAIT_FOR_KEY_PRESS)
             {
@@ -82,34 +102,41 @@ int main(int argc, char* argv[])
                 runtime->PROGRAMM_INDEX++;
             }
         }
-    }, &runtime).detach();
+    }, &runtime);
 
-    while (window.isOpen())
+    if (!nogui)
     {
-        sf::Event event;
+        t1.detach();
 
-        while (window.pollEvent(event))
+        while (window.isOpen())
         {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
-            else if (event.type == sf::Event::KeyPressed)
+            sf::Event event;
+
+            while (window.pollEvent(event))
             {
-                runtime.WAIT_FOR_KEY_PRESS = false;
-                runtime.KEY_IS_PRESSED = true;
-                runtime.SHIFT_PRESSED = event.key.shift;
-                runtime.CTRL_PRESSED = event.key.shift;
-                runtime.INPUT_BUFFER = event.key.code;
+                // "close requested" event: we close the window
+                if (event.type == sf::Event::Closed)
+                    window.close();
+                else if (event.type == sf::Event::KeyPressed)
+                {
+                    runtime.WAIT_FOR_KEY_PRESS = false;
+                    runtime.KEY_IS_PRESSED = true;
+                    runtime.SHIFT_PRESSED = event.key.shift;
+                    runtime.CTRL_PRESSED = event.key.shift;
+                    runtime.INPUT_BUFFER = event.key.code;
+                }
             }
+
+            runtime.KEY_IS_PRESSED = false;
+            texture.update(runtime.getPixelStates());
+            sprite.setScale(4, 4);
+            window.draw(sprite);
+
+            window.display();
         }
-
-        runtime.KEY_IS_PRESSED = false;
-        texture.update(runtime.getPixelStates());
-        sprite.setScale(4, 4);
-        window.draw(sprite);
-
-        window.display();
     }
+    else
+        t1.join();
 
     return 0;
 }

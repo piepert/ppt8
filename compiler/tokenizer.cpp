@@ -87,16 +87,21 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                         }
                     }
                     else
+                    {
                         toks.push_back(Token(TokenType::makeValue(tmp),
                             TokenType::determineType(tmp, linec, runtime),
                             linec,
                             linei));
+                    }
                 }
                 else
+                {
                     toks.push_back(Token(TokenType::makeValue(tmp),
                         TokenType::determineType(tmp, linec, runtime),
                         linec,
                         linei));
+                }
+
                 tmp = "";
             }
 
@@ -188,12 +193,12 @@ std::vector<Token> Tokenizer::tokenize(std::string code, Runtime* runtime)
                 i++;
             }
 
-            toks.push_back(Token(tmp, TokenType("s"), linec, linei));
+            toks.push_back(Token(tmp, TokenType("str"), linec, linei));
             tmp = "";
         }
         else if (code[i] == ':')
         {
-            toks.push_back(Token(tmp, TokenType("label"), linec, linei));
+            toks.push_back(Token(tmp, TokenType("label_def"), linec, linei));
             tmp = "";
         }
         else

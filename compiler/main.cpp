@@ -43,8 +43,12 @@ int main(int argc, char* argv[])
             usleep(1000000 / 5); // wait 0.2 second
         }
 
-        lm = cache;
-        std::cout << "Updated. " << cache << std::endl;
+        if (watch)
+        {
+            lm = cache;
+            std::cout << "Updated. " << cache << std::endl;
+        }
+        
         std::ifstream ifs(argv[1]);
 
         if (!ifs.is_open())
@@ -76,7 +80,9 @@ int main(int argc, char* argv[])
             {
                 if (t.getType().getPattern() == "new_line")
                     continue;
-                else if (t.getType().getPattern() != "v" && t.getType().getPattern() != "vv")
+                else if (t.getType().getPattern() != "v" && 
+                    t.getType().getPattern() != "vv" && 
+                    t.getType().getPattern() != "str")
                 {
                     if (!command.empty())
                         commands.push_back(command);
@@ -90,14 +96,30 @@ int main(int argc, char* argv[])
                 continue;
             }
 
+            if (t.getType().getPattern() == "label_def")
+            {
+                if (!command.empty())
+                    commands.push_back(command);
+
+                command.clear();
+
+                command.push_back(t);
+                commands.push_back(command);
+
+                command.clear();
+                continue;
+            }
+
             if (t.getType().getPattern() == "new_line")
             {
                 if (!command.empty())
                     commands.push_back(command);
+
                 command.clear();
+                continue;
             }
-            else
-                command.push_back(t);
+
+            command.push_back(t);
         }
 
         for (std::vector<Token> &command : commands)
@@ -106,10 +128,24 @@ int main(int argc, char* argv[])
             {
                 if (command[i].getValue() == "word" || command[i].getValue() == "@")
                 {
+                    // std::cout << command.size() << " " << command[i+1].getValue() <<  " " << command[i+1].getType().getPattern() << std::endl;
+
                     if (command[i].getValue() == "word" && command[i+1].getValue() == "@")
                         continue;
                     if (command[i].getValue() == "@" && command[i+1].getType().getPattern() == "r")
                         continue;
+                    if (command.size() > i+1 && command[i+1].getType().getPattern() == "label_def")
+                        continue;
+                    if (command.size() > i+1 && command[i+1].getType().getPattern() == "wordvv" &&
+                        runtime.existsNameByValue(command[i+1].getValue()))
+                    {
+                        Token tok = command[i+1];
+                        command.erase(command.begin()+i+1);
+                        command.insert(command.begin()+i+1,
+                            Token(tok.getValue(), TokenType("vv"),
+                                tok.getLine(),
+                                tok.getLineIndex()));
+                    }
 
                     if (command.size()-(i+1) < 2 && command[i+1].getType().getPattern() != "vv")
                         command.insert(command.begin()+i+1,
@@ -131,8 +167,12 @@ int main(int argc, char* argv[])
 
         for (std::vector<Token> &command : commands)
         {
+            /* for (int i = 0; i < command.size(); i++)
+                std::cout << command[i].getValue() << " " << command[i].getType().getPattern() << std::endl;
+            std::cout << std::endl; */
+
             output += "    ";
-            if (command[0].getType().getPattern() == "label")
+            if (command[0].getType().getPattern() == "label_def")
             {
                 output += "\n"+command[0].getValue()+":\n";
                 continue;
@@ -140,7 +180,12 @@ int main(int argc, char* argv[])
             else if (command[0].getValue() == "db")
             {
                 for (int i = 1; i < command.size(); i++)
-                    output += command[i].getValue()+" ";
+                {
+                    if (command[i].getType().getPattern() == "str")
+                        output += "\""+command[i].getValue()+"\" ";
+                    else
+                        output += command[i].getValue()+" ";
+                }
                 output += "\n";
             }
             else if (command[0].getValue() == "alloc")
@@ -188,15 +233,15 @@ int main(int argc, char* argv[])
                     output += command[i].getValue()+" "+
                         command[i+1].getValue() + ", "+
                         command[i+2].getValue()+" "+
-                        command[i+3].getValue()+", ";
+                        (command[i+3].getType().getPattern() != "str" ? command[i+3].getValue() : "\""+command[i+3].getValue()+"\"")+", ";
 
                     i += 4;
                 }
 
                 for (; i < command.size(); i++)
-                    output += (command[i].getType().getPattern() == "s" ? "\"" : "") +
+                    output += (command[i].getType().getPattern() == "str" ? "\"" : "") +
                         command[i].getValue() +
-                        (command[i].getType().getPattern() == "s" ? "\"" : "") + " ";
+                        (command[i].getType().getPattern() == "str" ? "\"" : "") + " ";
 
                 output += "\n";
                 // alloc a,l,...
@@ -206,6 +251,10 @@ int main(int argc, char* argv[])
             {
                 std::string mnemonic = get_mnemonic_for_pattern(command);
                 output += mnemonic+" ";
+                
+                /* std::cout << "C" << std::endl;
+                for (auto c : command)
+                    std::cout << "CC " << c.getValue() << " " << mnemonic << std::endl; */
 
                 if (mnemonic == "null")
                 {
@@ -246,6 +295,8 @@ int main(int argc, char* argv[])
                     {
                         if (runtime.existsVariableByName(command[i].getValue()))
                             output += runtime.getVariableByName(command[i].getValue())->getValue();
+                        else if (command[i].getType().getPattern() == "str")
+                            output += "\""+command[i].getValue()+"\"";
                         else
                             output += command[i].getValue();
 

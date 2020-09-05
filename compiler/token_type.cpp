@@ -7,7 +7,7 @@ TokenType TokenType::determineType(std::string token, int line, Runtime* runtime
     // c - commands
     // v - byte
     // n - name
-    // label - label
+    // label_def - label definition
     // r - register
     // s - subregister
     // @ - @/address
@@ -64,6 +64,8 @@ TokenType TokenType::determineType(std::string token, int line, Runtime* runtime
             return TokenType("wordvv");
         else if (runtime->getNameByValue(token)->getType() == NT_Variable)
             return TokenType("vv");
+        else                                        // else it has to be label
+            return TokenType("wordvv");
     }
 
     if (token == "~")

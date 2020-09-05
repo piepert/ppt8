@@ -1,4 +1,5 @@
 #include "runtime.hpp"
+#include <iostream>
 
 void Runtime::registerName(Name n)
 {
