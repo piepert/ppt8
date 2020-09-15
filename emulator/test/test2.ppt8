@@ -1,14 +1,16 @@
-jmp start
+jmp     start
 
-hallo:
-    alloc   word 0, ~, "Hallo Welt!\x0a"
-    mov     ax, word 0
-    int     0x02
-    int     0x02
-    ret
-    int     0x02
+data: db 0 0 255 0 255 0
+endstr: db "Enter zum Fortfahren.\x00"
 
 start:
-    call    hallo
+    mov     ax, word data
+    mov     bx, word 6
+    mov     cx, word 0
+    mov     dx, word 0
+    int     12
+
+    mov     ax, word endstr
     int     0x02
     int     0x03        # enter to continue
+    int     0x07

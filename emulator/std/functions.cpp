@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <thread>
 
 #include "functions.hpp"
 #include "../runtime/runtime.hpp"
@@ -38,7 +39,7 @@ int ppt8_std::functions::interrupt(uint8_t code, Runtime *runtime)
             runtime->getDX()->setValueLower8bit(c);
             break;
 
-        case 4: // exit programm with exit code in DX
+        case 4: // get char
             c = ppt8_std::get_char();
             runtime->getDX()->setValueLower8bit(c);
             std::cout << c;
@@ -65,10 +66,10 @@ int ppt8_std::functions::interrupt(uint8_t code, Runtime *runtime)
             runtime->getDX()->setValueLower8bit(c);
             break;
 
-        case 7:
+        case 7: // exit program with exit code in DX
             exit(runtime->getDX()->getComplete16bit());
 
-        case 8:
+        case 8: // generate random number
             runtime->getDX()->setValueComplete16bit(rnd(rng));
             break;
 
@@ -109,7 +110,19 @@ int ppt8_std::functions::interrupt(uint8_t code, Runtime *runtime)
             break;
         }
 
-        case 12: // clear pixels
+        case 12: // load BX pixels from AX to CX(x) and DX(y)
+            std::thread([](Runtime* runtime, uint16_t count, uint16_t address, uint16_t x, uint16_t y) {
+                for (uint16_t i = 0; i < count; i++)
+                    runtime->setPixelState(x+i, y, runtime->getMemory()->getValueFromAddress(address+i));
+            }, 
+                runtime,
+                runtime->getBX()->getComplete16bit(),
+                runtime->getAX()->getComplete16bit(),
+                runtime->getCX()->getComplete16bit(),
+                runtime->getDX()->getComplete16bit()).detach();
+            break;
+
+        case 13: // clear pixels
             runtime->clearPixels();
             break;
 
