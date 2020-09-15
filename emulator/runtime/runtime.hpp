@@ -46,6 +46,9 @@ public:
     bool CTRL_PRESSED = false;
     sf::RenderWindow* window;
 
+    uint16_t SCREEN_WIDTH;
+    uint16_t SCREEN_HEIGHT;
+
     Runtime(int screen_width, int screen_height);
 
     Memory* getMemory();

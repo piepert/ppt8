@@ -374,6 +374,8 @@ Runtime::Runtime(int screen_width, int screen_height)
     this->WAIT_FOR_KEY_PRESS = false;
     this->INPUT_BUFFER = sf::Keyboard::Key();
     this->screen = new sf::Uint8[screen_height * screen_width * 4];
+    this->SCREEN_WIDTH = screen_width;
+    this->SCREEN_HEIGHT = screen_height;
 
     for(int i = 0; i < screen_width*screen_height*4; i += 4)
     {
