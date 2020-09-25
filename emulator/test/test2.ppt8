@@ -1,6 +1,6 @@
 jmp     start
 
-data: db 0 0 255 0 255 0
+data: db 255 200 150 100 50 0
 endstr: db "Enter zum Fortfahren.\x00"
 
 start:

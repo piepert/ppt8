@@ -16,14 +16,27 @@ int main(int argc, char* argv[])
     std::string file;
     std::string code;
 
+    std::string str_screen_factor = "4";
+    std::string str_scr_width = "320";
+    std::string str_scr_height = "200";
+
     for (int i = 0; i < argc; i++) {
         if (std::string(argv[i]) == "-nogui") 
             nogui = true;
         else if (std::string(argv[i]) == "debug") 
             debug = true;
-        else 
+        else if (std::string(argv[i]).substr(0, 5) == "-fac=") 
+            str_screen_factor = std::string(argv[i]).substr(5, std::string(argv[i]).size());
+        else if (std::string(argv[i]).substr(0, 3) == "-w=") 
+            str_scr_width = std::string(argv[i]).substr(3, std::string(argv[i]).size());
+        else if (std::string(argv[i]).substr(0, 3) == "-h=") 
+            str_scr_height = std::string(argv[i]).substr(3, std::string(argv[i]).size());
+        else
             file = argv[i];
     }
+
+    std::cout << str_scr_height << std::endl;
+    std::cout << str_scr_width << std::endl;
 
     if (nogui)
     {
@@ -53,17 +66,23 @@ int main(int argc, char* argv[])
             ppt8_std::run_command(runtime.getMemory()->getValueFromAddress(runtime.PROGRAMM_INDEX), &runtime.PROGRAMM_INDEX, &runtime);
             runtime.PROGRAMM_INDEX++;
         }
+
         return 0;
     }
 
-    int grid_width = 40;
-    int grid_height = 10;
+    int emulated_window_width = 320;
+    int emulated_window_height = 200;
 
-    int emulated_window_width = grid_width*8;
-    int emulated_window_height = grid_height*20;
+    int scaling_factor = std::stoi(str_screen_factor);
+    emulated_window_width = std::stoi(str_scr_width);
+    emulated_window_height = std::stoi(str_scr_height);
 
-    int window_width = emulated_window_width*4;
-    int window_height = emulated_window_height*4;
+    std::cout << "screen-width: " << emulated_window_width << std::endl;
+    std::cout << "screen-height: " << emulated_window_height << std::endl;
+    std::cout << "screen-scaling: " << scaling_factor << std::endl;
+
+    int window_width = emulated_window_width*scaling_factor;
+    int window_height = emulated_window_height*scaling_factor;
 
     int pixel_size = window_width / emulated_window_width;
 
@@ -129,7 +148,7 @@ int main(int argc, char* argv[])
 
             runtime.KEY_IS_PRESSED = false;
             texture.update(runtime.getPixelStates());
-            sprite.setScale(4, 4);
+            sprite.setScale(scaling_factor, scaling_factor);
             window.draw(sprite);
 
             window.display();
