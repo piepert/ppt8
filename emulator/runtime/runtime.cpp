@@ -385,9 +385,9 @@ Register *Runtime::getRegisterByID(uint8_t id)
     return 0;
 }
 
-void Runtime::raiseException(std::string string)
+void Runtime::raiseException(std::string s)
 {
-    std::cout << std::endl << std::endl << string << std::endl << "Press enter to exit." << std::endl;
+    std::cout << std::endl << std::endl << s << std::endl << "Press enter to exit." << std::endl;
     ppt8_std::get_char();
     exit(1);
 }

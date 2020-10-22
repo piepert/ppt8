@@ -45,7 +45,7 @@ public:
     Register* getGX();
     Register* getHX();
 
-    void raiseException(std::string string);
+    void raiseException(std::string s);
     void addCommand(Command* command);
 
     bool existsCommand(uint8_t opcode);
